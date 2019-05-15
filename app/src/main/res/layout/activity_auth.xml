@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.googleapiservices.presentation.activities.auth.AuthActivity">
+
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/loginBtnAuthFacebook"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/indentation_8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/google_sign_in_button" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/google_sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/indentation_32"
+        app:layout_constraintEnd_toStartOf="@+id/glAuthRight"
+        app:layout_constraintStart_toStartOf="@+id/glAuthLeft"
+        app:layout_constraintTop_toBottomOf="@+id/profileAuthEmail" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/glAuthLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/indentation_16" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/glAuthRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/indentation_16" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profileAuthPic"
+        android:layout_width="@dimen/view_param_150"
+        android:layout_height="@dimen/view_param_150"
+        android:layout_marginTop="@dimen/indentation_32"
+        app:layout_constraintEnd_toStartOf="@+id/glAuthRight"
+        app:layout_constraintStart_toStartOf="@+id/glAuthLeft"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/profileAuthName"
+        android:layout_width="@dimen/indentation_0"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/indentation_16"
+        android:layout_marginLeft="@dimen/indentation_16"
+        android:layout_marginRight="@dimen/indentation_16"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/txt_size_20"
+        app:layout_constraintEnd_toStartOf="@+id/glAuthRight"
+        app:layout_constraintStart_toStartOf="@+id/glAuthLeft"
+        app:layout_constraintTop_toBottomOf="@+id/profileAuthPic" />
+
+    <TextView
+        android:id="@+id/profileAuthEmail"
+        android:layout_width="@dimen/indentation_0"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/indentation_8"
+        android:layout_marginLeft="@dimen/indentation_16"
+        android:layout_marginRight="@dimen/indentation_16"
+        android:textSize="@dimen/txt_size_18"
+        android:gravity="center_horizontal"
+        app:layout_constraintEnd_toStartOf="@+id/glAuthRight"
+        app:layout_constraintStart_toStartOf="@+id/glAuthLeft"
+        app:layout_constraintTop_toBottomOf="@+id/profileAuthName" />
+
+</android.support.constraint.ConstraintLayout>

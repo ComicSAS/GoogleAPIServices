@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1018648818118",
+    "firebase_url": "https://mystic-stack-240016.firebaseio.com",
+    "project_id": "mystic-stack-240016",
+    "storage_bucket": "mystic-stack-240016.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1018648818118:android:67b0c602bad8330e",
+        "android_client_info": {
+          "package_name": "com.obscura"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1018648818118-148tfhuna6vp0retmnib8mont6u0p8q8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.obscura",
+            "certificate_hash": "e10bba5a916b3d03efe00ac820db0e7715ec5dba"
+          }
+        },
+        {
+          "client_id": "1018648818118-icvarv8ajs4i075afep3odq0r54h7fj9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATIPRRcY91YaX2JQfvJgRhTffpBMA5wL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1018648818118-icvarv8ajs4i075afep3odq0r54h7fj9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
