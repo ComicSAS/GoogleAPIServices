@@ -2,11 +2,13 @@ package com.example.googleapiservices.presentation.activities.auth;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +30,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import org.json.JSONException;
@@ -42,29 +45,30 @@ public class AuthActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 0;
     private static final String TAG = "AuthActivity";
 
+    private static final String EMAIL = "email";
+    private static final String PUBLIC_PROFILE = "public_profile";
+
     private LoginButton authFacebookLoginButton;
 
-    private SignInButton authSingInButton;
+    private SignInButton authSignInButton;
+
+    private Button authSignOutButton;
 
     private CircleImageView authCircleImageVIew;
+
     private TextView authTxtName, authTxtEmail;
 
     private CallbackManager authCallBackManager;
 
-    private View.OnClickListener googleSignInAction;
-
-    private static final String EMAIL = "email";
-    private static final String PUBLIC_PROFILE = "public_profile";
+    private View.OnClickListener googleSignInAction, googleSignOutAction;
 
     private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onStart() {
         super.onStart();
-        // Check for existing Google Sign In account, if the user is already signed in
-// the GoogleSignInAccount will be non-null.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        updateUI(account);
+        checkLoginStatus();
+        checkSingInStatus();
     }
 
     @Override
@@ -87,7 +91,7 @@ public class AuthActivity extends AppCompatActivity {
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        authSingInButton.setOnClickListener(googleSignInAction);
+        bindListeners();
 
         authCallBackManager = CallbackManager.Factory.create();
         authFacebookLoginButton.setReadPermissions(Arrays.asList(EMAIL, PUBLIC_PROFILE));
@@ -109,11 +113,23 @@ public class AuthActivity extends AppCompatActivity {
             }
         });
         checkLoginStatus();
+//        checkSingInStatus();
     }
 
     private void checkLoginStatus() {
-        if (AccessToken.getCurrentAccessToken() != null)
+        if (AccessToken.getCurrentAccessToken() != null) {
             loadUserProfile(AccessToken.getCurrentAccessToken());
+            authSignInButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void checkSingInStatus() {
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
+            updateUI(GoogleSignIn.getLastSignedInAccount(this));
+            authSignInButton.setVisibility(View.INVISIBLE);
+            authSignOutButton.setVisibility(View.VISIBLE);
+        }
+
     }
 
     private void initViews() {
@@ -121,9 +137,10 @@ public class AuthActivity extends AppCompatActivity {
         authCircleImageVIew = findViewById(R.id.profileAuthPic);
         authTxtName = findViewById(R.id.profileAuthName);
         authTxtEmail = findViewById(R.id.profileAuthEmail);
-        authSingInButton = findViewById(R.id.google_sign_in_button);
-        authSingInButton.setSize(SignInButton.SIZE_WIDE);
-        authSingInButton.setColorScheme(SignInButton.COLOR_DARK);
+        authSignInButton = findViewById(R.id.google_sign_in_button);
+        authSignInButton.setSize(SignInButton.SIZE_WIDE);
+        authSignInButton.setColorScheme(SignInButton.COLOR_DARK);
+        authSignOutButton = findViewById(R.id.google_sign_out_button);
     }
 
     private void initListeners() {
@@ -133,17 +150,30 @@ public class AuthActivity extends AppCompatActivity {
                 signIn();
             }
         };
+        googleSignOutAction = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
+            }
+        };
+    }
+
+    private void bindListeners() {
+        authSignInButton.setOnClickListener(googleSignInAction);
+        authSignOutButton.setOnClickListener(googleSignOutAction);
     }
 
     private void updateUI(GoogleSignInAccount account) {
-        String personName = account.getDisplayName();
-        String personEmail = account.getEmail();
-        Uri personPhoto = account.getPhotoUrl();
         if (account == null) {
             authTxtName.setText("");
             authTxtEmail.setText("");
             authCircleImageVIew.setImageResource(0);
+            authSignOutButton.setVisibility(View.INVISIBLE);
         } else {
+            authFacebookLoginButton.setVisibility(View.INVISIBLE);
+            String personName = account.getDisplayName();
+            String personEmail = account.getEmail();
+            Uri personPhoto = account.getPhotoUrl();
             authTxtName.setText(personName);
             authTxtEmail.setText(personEmail);
             Glide.with(AuthActivity.this).load(personPhoto).into(authCircleImageVIew);
@@ -153,6 +183,22 @@ public class AuthActivity extends AppCompatActivity {
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void signOut() {
+        authTxtName.setText("");
+        authTxtEmail.setText("");
+        authCircleImageVIew.setImageResource(0);
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                    }
+                });
+        authFacebookLoginButton.setVisibility(View.VISIBLE);
+        authSignOutButton.setVisibility(View.INVISIBLE);
+        authSignInButton.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -174,6 +220,9 @@ public class AuthActivity extends AppCompatActivity {
 
             // Signed in successfully, show authenticated UI.
             updateUI(account);
+            authSignOutButton.setVisibility(View.VISIBLE);
+            authSignInButton.setVisibility(View.INVISIBLE);
+            authFacebookLoginButton.setVisibility(View.INVISIBLE);
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
@@ -190,8 +239,12 @@ public class AuthActivity extends AppCompatActivity {
                 authTxtEmail.setText("");
                 authCircleImageVIew.setImageResource(0);
                 Toast.makeText(AuthActivity.this, "Successful log out", Toast.LENGTH_LONG).show();
-            } else
+                authSignInButton.setVisibility(View.VISIBLE);
+            } else {
                 loadUserProfile(currentAccessToken);
+                authSignInButton.setVisibility(View.INVISIBLE);
+            }
+
         }
     };
 

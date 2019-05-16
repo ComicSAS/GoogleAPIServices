@@ -3,4 +3,5 @@
     <string name="google_key">AIzaSyBIc3H2WOi87eY9AwrPpxpe4WEXWX7jT-c</string>
     <string name="facebook_app_id">323157628602384</string>
     <string name="fb_login_protocol_scheme">fb323157628602384</string>
+    <string name="google_sign_out">Sign out</string>
 </resources>
