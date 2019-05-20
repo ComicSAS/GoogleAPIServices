@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,10 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.googleapiservices.R;
+import com.example.googleapiservices.model.User;
+import com.example.googleapiservices.presentation.fragments.FacebookFragment;
+import com.example.googleapiservices.presentation.fragments.GoogleFragment;
+import com.example.googleapiservices.presentation.fragments.NavigationFragment;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -40,13 +45,15 @@ import java.util.Arrays;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AuthActivity extends AppCompatActivity {
+public class AuthActivity extends AppCompatActivity implements AuthContract.AuthListener {
 
     private static final int RC_SIGN_IN = 0;
     private static final String TAG = "AuthActivity";
 
     private static final String EMAIL = "email";
     private static final String PUBLIC_PROFILE = "public_profile";
+
+    private AuthContract.AuthCallback mFlowCallback;
 
     private LoginButton authFacebookLoginButton;
 
@@ -81,6 +88,7 @@ public class AuthActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
+        openScreen(AuthContract.AuthFlow.DEFAULT);
         initViews();
         initListeners();
 
@@ -211,6 +219,24 @@ public class AuthActivity extends AppCompatActivity {
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
+
+            GoogleSignInAccount account = null;
+            try {
+                account = task.getResult(ApiException.class);
+
+                updateUI(account);
+                User user = new User();
+                user.setmEmail(account.getEmail());
+                user.setmName(account.getGivenName());
+                user.setnSurnme(account.getFamilyName());
+                user.setmUrl(String.valueOf(account.getPhotoUrl()));
+                if(mFlowCallback != null) mFlowCallback.showData(user); mFlowCallback = null;
+            } catch (ApiException e) {
+                e.printStackTrace();
+            }
+
+            // Signed in successfully, show authenticated UI.
+
         }
     }
 
@@ -277,6 +303,45 @@ public class AuthActivity extends AppCompatActivity {
         parametrs.putString("fields", "first_name,last_name,email,id");
         request.setParameters(parametrs);
         request.executeAsync();
+    }
+
+    @Override
+    public void socialAuth(AuthContract.AuthFlow type, AuthContract.AuthCallback callback) {
+        switch (type){
+            case GOOGLE:
+                mFlowCallback = callback;
+                // todo use function with logic startActivityForResult login Google
+                break;
+            case FACEBOOK:
+                mFlowCallback = callback;
+                // todo use function with logic startActivityForResult login Facebook
+                break;
+        }
+    }
+
+    @Override
+    public void openScreen(AuthContract.AuthFlow type) {
+        switch (type){
+            case FACEBOOK:
+                getOpenScreen(FacebookFragment.newInstance());
+                break;
+            case GOOGLE:
+                getOpenScreen(GoogleFragment.newInstance());
+                break;
+            case DEFAULT:
+                getSupportFragmentManager().popBackStack();
+//                getOpenScreen(NavigationFragment.newInstance());
+                break;
+        }
+    }
+
+    private void getOpenScreen(Fragment fragment){
+        //get fragment manager
+        getSupportFragmentManager()
+                .beginTransaction()// open transaction for bind fragment
+                .addToBackStack("Auth") // for back stack
+                .replace(R.id.auth_container, fragment) // get arial for bind fragment (R.id.auth_container) and fragment
+                .commit();
     }
 }
 

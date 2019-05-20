@@ -4,4 +4,9 @@
     <string name="facebook_app_id">323157628602384</string>
     <string name="fb_login_protocol_scheme">fb323157628602384</string>
     <string name="google_sign_out">Sign out</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="nav_choose_auth_with_google">choose auth with google</string>
+    <string name="nav_choose_auth_with_facebook">choose auth with facebook</string>
 </resources>
