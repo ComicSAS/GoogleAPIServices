@@ -2,16 +2,12 @@ package com.example.googleapiservices.presentation.activities.auth;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.request.RequestOptions;
 import com.example.googleapiservices.R;
@@ -19,6 +15,7 @@ import com.example.googleapiservices.databinding.ActivityAuthBinding;
 import com.example.googleapiservices.model.User;
 import com.example.googleapiservices.presentation.fragments.FacebookFragment;
 import com.example.googleapiservices.presentation.fragments.GoogleFragment;
+import com.example.googleapiservices.presentation.fragments.NavigationFragment;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -32,7 +29,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -58,6 +54,8 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
 
     private GoogleSignInClient mGoogleSignInClient;
 
+    private LoginButton mbtnFacebookLogin;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -72,7 +70,7 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityAuthBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_auth);
-        openScreen(AuthContract.AuthFlow.DEFAULT);
+        getOpenScreen(NavigationFragment.newInstance());
 
 
         // Configure sign-in to request the user's ID, email address, and basic
@@ -84,9 +82,9 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         authCallBackManager = CallbackManager.Factory.create();
-        binding.loginBtnAuthFacebook.setReadPermissions(Arrays.asList(EMAIL, PUBLIC_PROFILE));
-
-        binding.loginBtnAuthFacebook.registerCallback(authCallBackManager, new FacebookCallback<LoginResult>() {
+        mbtnFacebookLogin = findViewById(R.id.btnFacebookLogin);
+        mbtnFacebookLogin.setReadPermissions(Arrays.asList(EMAIL, PUBLIC_PROFILE));
+        mbtnFacebookLogin.registerCallback(authCallBackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
 
@@ -102,7 +100,32 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
 
             }
         });
+//        binding.loginBtnAuthFacebook.setReadPermissions(Arrays.asList(EMAIL, PUBLIC_PROFILE));
+//
+//        binding.loginBtnAuthFacebook.registerCallback(authCallBackManager, new FacebookCallback<LoginResult>() {
+//            @Override
+//            public void onSuccess(LoginResult loginResult) {
+//
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//
+//            }
+//
+//            @Override
+//            public void onError(FacebookException error) {
+//
+//            }
+//        });
     }
+
+    AccessTokenTracker tokenTracker = new AccessTokenTracker() {
+        @Override
+        protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+
+        }
+    };
 
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -144,6 +167,7 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
     }
 
     private void loadUserProfile(AccessToken newAccessToken) {
+
         GraphRequest request = GraphRequest.newMeRequest(newAccessToken, new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
@@ -182,15 +206,11 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
         switch (type) {
             case GOOGLE:
                 mFlowCallback = callback;
-                // todo use function with logic startActivityForResult login Google
-                Intent googleAuthIntent = new Intent(AuthActivity.this, GoogleFragment.class);
-                startActivityForResult(googleAuthIntent, OPEN_GOOGLE_FRAGMENT);
+                signIn();
                 break;
             case FACEBOOK:
                 mFlowCallback = callback;
                 // todo use function with logic startActivityForResult login Facebook
-                Intent facebookAuthIntent = new Intent(AuthActivity.this, FacebookFragment.class);
-                startActivityForResult(facebookAuthIntent, OPEN_FACEBOOK_FRAGMENT);
                 break;
         }
     }

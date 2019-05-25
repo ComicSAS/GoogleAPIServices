@@ -59,4 +59,7 @@ public class GoogleFragment extends Fragment implements AuthContract.AuthCallbac
     public void getSocialAuth(){
         if(mListener != null) mListener.socialAuth(AuthContract.AuthFlow.GOOGLE, this);
     }
+    public void googleReturn(){
+        mListener.openScreen(AuthContract.AuthFlow.DEFAULT);
+    }
 }

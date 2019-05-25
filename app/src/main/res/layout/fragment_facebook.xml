@@ -41,14 +41,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txtFacebookName" />
 
-        <Button
-            android:id="@+id/btnFacebookReturn"
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/btnFacebookLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/indentation_16"
             android:layout_marginBottom="@dimen/indentation_16"
-            android:onClick="@{handler.getSocialAuth()}"
-            android:text="@string/facebook_return"
+            android:onClick="@{(view)->handler.getSocialAuth()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

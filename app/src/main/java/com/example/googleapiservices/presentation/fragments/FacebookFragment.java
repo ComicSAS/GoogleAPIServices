@@ -30,7 +30,7 @@ public class FacebookFragment extends Fragment implements AuthContract.AuthCallb
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(
-                inflater, R.layout.fragment_google, container, false);
+                inflater, R.layout.fragment_facebook, container, false);
         mBinding.setHandler(this);
         return mBinding.getRoot();
     }

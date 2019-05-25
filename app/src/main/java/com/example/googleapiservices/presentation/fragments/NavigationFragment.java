@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.example.googleapiservices.R;
 import com.example.googleapiservices.databinding.FragmentNavigationBinding;
@@ -17,11 +16,13 @@ import com.example.googleapiservices.presentation.activities.auth.AuthContract;
 public class NavigationFragment extends Fragment {
 
     private AuthContract.AuthListener mListener;
+    private FragmentNavigationBinding mBinding;
 
 
     public NavigationFragment() {
         // Required empty public constructor
     }
+
     public static NavigationFragment newInstance() {
         return new NavigationFragment();
     }
@@ -29,17 +30,17 @@ public class NavigationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        FragmentNavigationBinding binding = DataBindingUtil.inflate(
-                inflater, R.layout.fragment_google, container, false);
-        binding.setHandler(this);
-        return binding.getRoot();
+        mBinding = DataBindingUtil.inflate(
+                inflater, R.layout.fragment_navigation, container, false);
+        mBinding.setHandler(this);
+        return mBinding.getRoot();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof AuthContract.AuthListener) {
-            mListener = ( AuthContract.AuthListener) context;
+            mListener = (AuthContract.AuthListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -52,8 +53,8 @@ public class NavigationFragment extends Fragment {
         mListener = null;
     }
 
-    public void getOpenFragment(AuthContract.AuthFlow flow){
-        switch (flow){
+    public void getOpenFragment(AuthContract.AuthFlow flow) {
+        switch (flow) {
             case GOOGLE:
                 mListener.openScreen(AuthContract.AuthFlow.GOOGLE);
                 break;
