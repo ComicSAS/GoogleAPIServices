@@ -1,6 +1,7 @@
 package com.example.googleapiservices.presentation.fragments;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.googleapiservices.R;
+import com.example.googleapiservices.databinding.FragmentNavigationBinding;
 import com.example.googleapiservices.presentation.activities.auth.AuthContract;
 
 
@@ -16,19 +18,6 @@ public class NavigationFragment extends Fragment {
 
     private AuthContract.AuthListener mListener;
 
-    private View.OnClickListener onGoogleAction = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            mListener.openScreen(AuthContract.AuthFlow.GOOGLE);
-        }
-    };
-
-    private View.OnClickListener onFacebookAction = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            mListener.openScreen(AuthContract.AuthFlow.FACEBOOK);
-        }
-    };
 
     public NavigationFragment() {
         // Required empty public constructor
@@ -40,12 +29,10 @@ public class NavigationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_navigation, container, false);
-        Button googleScreen = v.findViewById(R.id.btn_nav_auth_google);
-        googleScreen.setOnClickListener(onGoogleAction);
-        Button facebookScreen = v.findViewById(R.id.btn_nav_auth_facebook);
-        facebookScreen.setOnClickListener(onFacebookAction);
-        return v;
+        FragmentNavigationBinding binding = DataBindingUtil.inflate(
+                inflater, R.layout.fragment_google, container, false);
+        binding.setHandler(this);
+        return binding.getRoot();
     }
 
     @Override
@@ -63,5 +50,16 @@ public class NavigationFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public void getOpenFragment(AuthContract.AuthFlow flow){
+        switch (flow){
+            case GOOGLE:
+                mListener.openScreen(AuthContract.AuthFlow.GOOGLE);
+                break;
+            case FACEBOOK:
+                mListener.openScreen(AuthContract.AuthFlow.FACEBOOK);
+                break;
+        }
     }
 }

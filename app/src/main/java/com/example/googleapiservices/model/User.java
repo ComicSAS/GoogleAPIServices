@@ -5,10 +5,10 @@ import android.os.Build;
 import java.util.Objects;
 
 public class User {
-    String mName;
-    String nSurnme;
-    String mUrl;
-    String mEmail;
+    public String mName;
+    public String nSurnme;
+    public String mUrl;
+    public String mEmail;
 
     public User() {}
 

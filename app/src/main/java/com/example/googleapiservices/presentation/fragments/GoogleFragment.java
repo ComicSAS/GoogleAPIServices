@@ -1,6 +1,7 @@
 package com.example.googleapiservices.presentation.fragments;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,13 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.googleapiservices.R;
+import com.example.googleapiservices.databinding.FragmentGoogleBinding;
 import com.example.googleapiservices.model.User;
 import com.example.googleapiservices.presentation.activities.auth.AuthContract;
 
 public class GoogleFragment extends Fragment implements AuthContract.AuthCallback {
 
     private AuthContract.AuthListener mListener;
-
+    private FragmentGoogleBinding mBinding;
     public GoogleFragment() {
         // Required empty public constructor
     }
@@ -26,8 +28,10 @@ public class GoogleFragment extends Fragment implements AuthContract.AuthCallbac
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_google, container, false);
-        return v;
+        mBinding = DataBindingUtil.inflate(
+                inflater, R.layout.fragment_google, container, false);
+        mBinding.setHandler(this);
+        return mBinding.getRoot();
     }
 
     @Override
@@ -49,6 +53,10 @@ public class GoogleFragment extends Fragment implements AuthContract.AuthCallbac
 
     @Override
     public void showData(User user) {
-        //todo show data about autharizated user
+        mBinding.setUser(user);
+    }
+
+    public void getSocialAuth(){
+        if(mListener != null) mListener.socialAuth(AuthContract.AuthFlow.GOOGLE, this);
     }
 }

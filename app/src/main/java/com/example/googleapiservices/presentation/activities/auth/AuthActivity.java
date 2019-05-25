@@ -1,25 +1,24 @@
 package com.example.googleapiservices.presentation.activities.auth;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.googleapiservices.R;
+import com.example.googleapiservices.databinding.ActivityAuthBinding;
 import com.example.googleapiservices.model.User;
 import com.example.googleapiservices.presentation.fragments.FacebookFragment;
 import com.example.googleapiservices.presentation.fragments.GoogleFragment;
-import com.example.googleapiservices.presentation.fragments.NavigationFragment;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -43,11 +42,11 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 public class AuthActivity extends AppCompatActivity implements AuthContract.AuthListener {
 
     private static final int RC_SIGN_IN = 0;
+    private static final int OPEN_GOOGLE_FRAGMENT = 1;
+    private static final int OPEN_FACEBOOK_FRAGMENT = 2;
     private static final String TAG = "AuthActivity";
 
     private static final String EMAIL = "email";
@@ -55,42 +54,26 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
 
     private AuthContract.AuthCallback mFlowCallback;
 
-    private LoginButton authFacebookLoginButton;
-
-    private SignInButton authSignInButton;
-
-    private Button authSignOutButton;
-
-    private CircleImageView authCircleImageVIew;
-
-    private TextView authTxtName, authTxtEmail;
-
     private CallbackManager authCallBackManager;
-
-    private View.OnClickListener googleSignInAction, googleSignOutAction;
 
     private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onStart() {
         super.onStart();
-        checkLoginStatus();
-        checkSingInStatus();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        authFacebookTokenTracker.stopTracking();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_auth);
+        ActivityAuthBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_auth);
         openScreen(AuthContract.AuthFlow.DEFAULT);
-        initViews();
-        initListeners();
+
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -99,12 +82,11 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        bindListeners();
 
         authCallBackManager = CallbackManager.Factory.create();
-        authFacebookLoginButton.setReadPermissions(Arrays.asList(EMAIL, PUBLIC_PROFILE));
+        binding.loginBtnAuthFacebook.setReadPermissions(Arrays.asList(EMAIL, PUBLIC_PROFILE));
 
-        authFacebookLoginButton.registerCallback(authCallBackManager, new FacebookCallback<LoginResult>() {
+        binding.loginBtnAuthFacebook.registerCallback(authCallBackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
 
@@ -120,72 +102,6 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
 
             }
         });
-        checkLoginStatus();
-//        checkSingInStatus();
-    }
-
-    private void checkLoginStatus() {
-        if (AccessToken.getCurrentAccessToken() != null) {
-            loadUserProfile(AccessToken.getCurrentAccessToken());
-            authSignInButton.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    private void checkSingInStatus() {
-        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
-            updateUI(GoogleSignIn.getLastSignedInAccount(this));
-            authSignInButton.setVisibility(View.INVISIBLE);
-            authSignOutButton.setVisibility(View.VISIBLE);
-        }
-
-    }
-
-    private void initViews() {
-        authFacebookLoginButton = findViewById(R.id.loginBtnAuthFacebook);
-        authCircleImageVIew = findViewById(R.id.profileAuthPic);
-        authTxtName = findViewById(R.id.profileAuthName);
-        authTxtEmail = findViewById(R.id.profileAuthEmail);
-        authSignInButton = findViewById(R.id.google_sign_in_button);
-        authSignInButton.setSize(SignInButton.SIZE_WIDE);
-        authSignInButton.setColorScheme(SignInButton.COLOR_DARK);
-        authSignOutButton = findViewById(R.id.google_sign_out_button);
-    }
-
-    private void initListeners() {
-        googleSignInAction = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signIn();
-            }
-        };
-        googleSignOutAction = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signOut();
-            }
-        };
-    }
-
-    private void bindListeners() {
-        authSignInButton.setOnClickListener(googleSignInAction);
-        authSignOutButton.setOnClickListener(googleSignOutAction);
-    }
-
-    private void updateUI(GoogleSignInAccount account) {
-        if (account == null) {
-            authTxtName.setText("");
-            authTxtEmail.setText("");
-            authCircleImageVIew.setImageResource(0);
-            authSignOutButton.setVisibility(View.INVISIBLE);
-        } else {
-            authFacebookLoginButton.setVisibility(View.INVISIBLE);
-            String personName = account.getDisplayName();
-            String personEmail = account.getEmail();
-            Uri personPhoto = account.getPhotoUrl();
-            authTxtName.setText(personName);
-            authTxtEmail.setText(personEmail);
-            Glide.with(AuthActivity.this).load(personPhoto).into(authCircleImageVIew);
-        }
     }
 
     private void signIn() {
@@ -194,9 +110,6 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
     }
 
     private void signOut() {
-        authTxtName.setText("");
-        authTxtEmail.setText("");
-        authCircleImageVIew.setImageResource(0);
         mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
@@ -204,9 +117,6 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
 
                     }
                 });
-        authFacebookLoginButton.setVisibility(View.VISIBLE);
-        authSignOutButton.setVisibility(View.INVISIBLE);
-        authSignInButton.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -215,64 +125,23 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
         super.onActivityResult(requestCode, resultCode, data);
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
 
             GoogleSignInAccount account = null;
             try {
                 account = task.getResult(ApiException.class);
-
-                updateUI(account);
                 User user = new User();
                 user.setmEmail(account.getEmail());
                 user.setmName(account.getGivenName());
                 user.setnSurnme(account.getFamilyName());
                 user.setmUrl(String.valueOf(account.getPhotoUrl()));
-                if(mFlowCallback != null) mFlowCallback.showData(user); mFlowCallback = null;
+                if (mFlowCallback != null) mFlowCallback.showData(user);
+                mFlowCallback = null;
             } catch (ApiException e) {
                 e.printStackTrace();
             }
-
-            // Signed in successfully, show authenticated UI.
-
         }
     }
-
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
-            // Signed in successfully, show authenticated UI.
-            updateUI(account);
-            authSignOutButton.setVisibility(View.VISIBLE);
-            authSignInButton.setVisibility(View.INVISIBLE);
-            authFacebookLoginButton.setVisibility(View.INVISIBLE);
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            updateUI(null);
-        }
-    }
-
-    AccessTokenTracker authFacebookTokenTracker = new AccessTokenTracker() {
-        @Override
-        protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-            if (currentAccessToken == null) {
-                authTxtName.setText("");
-                authTxtEmail.setText("");
-                authCircleImageVIew.setImageResource(0);
-                Toast.makeText(AuthActivity.this, "Successful log out", Toast.LENGTH_LONG).show();
-                authSignInButton.setVisibility(View.VISIBLE);
-            } else {
-                loadUserProfile(currentAccessToken);
-                authSignInButton.setVisibility(View.INVISIBLE);
-            }
-
-        }
-    };
 
     private void loadUserProfile(AccessToken newAccessToken) {
         GraphRequest request = GraphRequest.newMeRequest(newAccessToken, new GraphRequest.GraphJSONObjectCallback() {
@@ -285,13 +154,16 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
                     String id = object.getString("id");
                     String image_url = "https://graph.facebook.com/" + id + "/picture?type=normal";
 
-                    authTxtEmail.setText(email);
-                    authTxtName.setText(first_name + " " + last_name);
+                    User user = new User();
+                    user.setmEmail(email);
+                    user.setmName(first_name);
+                    user.setnSurnme(last_name);
+                    user.setmUrl(image_url);
 
                     RequestOptions requestOptions = new RequestOptions();
                     requestOptions.dontAnimate();
-
-                    Glide.with(AuthActivity.this).load(image_url).into(authCircleImageVIew);
+                    if (mFlowCallback != null) mFlowCallback.showData(user);
+                    mFlowCallback = null;
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -307,21 +179,25 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
 
     @Override
     public void socialAuth(AuthContract.AuthFlow type, AuthContract.AuthCallback callback) {
-        switch (type){
+        switch (type) {
             case GOOGLE:
                 mFlowCallback = callback;
                 // todo use function with logic startActivityForResult login Google
+                Intent googleAuthIntent = new Intent(AuthActivity.this, GoogleFragment.class);
+                startActivityForResult(googleAuthIntent, OPEN_GOOGLE_FRAGMENT);
                 break;
             case FACEBOOK:
                 mFlowCallback = callback;
                 // todo use function with logic startActivityForResult login Facebook
+                Intent facebookAuthIntent = new Intent(AuthActivity.this, FacebookFragment.class);
+                startActivityForResult(facebookAuthIntent, OPEN_FACEBOOK_FRAGMENT);
                 break;
         }
     }
 
     @Override
     public void openScreen(AuthContract.AuthFlow type) {
-        switch (type){
+        switch (type) {
             case FACEBOOK:
                 getOpenScreen(FacebookFragment.newInstance());
                 break;
@@ -330,12 +206,11 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
                 break;
             case DEFAULT:
                 getSupportFragmentManager().popBackStack();
-//                getOpenScreen(NavigationFragment.newInstance());
                 break;
         }
     }
 
-    private void getOpenScreen(Fragment fragment){
+    private void getOpenScreen(Fragment fragment) {
         //get fragment manager
         getSupportFragmentManager()
                 .beginTransaction()// open transaction for bind fragment

@@ -9,4 +9,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="nav_choose_auth_with_google">choose auth with google</string>
     <string name="nav_choose_auth_with_facebook">choose auth with facebook</string>
+    <string name="google_return">Return</string>
+    <string name="facebook_return">Return</string>
 </resources>
