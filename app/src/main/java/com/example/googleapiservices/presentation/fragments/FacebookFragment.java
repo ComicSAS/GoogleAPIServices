@@ -60,4 +60,8 @@ public class FacebookFragment extends Fragment implements AuthContract.AuthCallb
     public void getSocialAuth(){
         if(mListener != null) mListener.socialAuth(AuthContract.AuthFlow.FACEBOOK, this);
     }
+
+    public void facebookReturn(){
+        mListener.openScreen(AuthContract.AuthFlow.DEFAULT);
+    }
 }
