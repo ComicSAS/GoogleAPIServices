@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.googleapiservices.R;
 import com.example.googleapiservices.databinding.ActivityAuthBinding;
 import com.example.googleapiservices.model.User;
+import com.example.googleapiservices.presentation.activities.auth.Adapter.AuthPagerAdapter;
 import com.example.googleapiservices.presentation.fragments.FacebookFragment;
 import com.example.googleapiservices.presentation.fragments.GoogleFragment;
 import com.example.googleapiservices.presentation.fragments.NavigationFragment;
@@ -56,6 +58,10 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
 
     private LoginButton mbtnFacebookLogin;
 
+    private AuthPagerAdapter mAuthAdapter;
+
+    private ViewPager mPager;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -70,8 +76,10 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityAuthBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_auth);
-        getOpenScreen(NavigationFragment.newInstance());
-
+//        getOpenScreen(NavigationFragment.newInstance());
+        mPager = findViewById(R.id.pager);
+        mAuthAdapter = new AuthPagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mAuthAdapter);
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -82,24 +90,24 @@ public class AuthActivity extends AppCompatActivity implements AuthContract.Auth
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         authCallBackManager = CallbackManager.Factory.create();
-        mbtnFacebookLogin = findViewById(R.id.btnFacebookLogin);
-        mbtnFacebookLogin.setReadPermissions(Arrays.asList(EMAIL, PUBLIC_PROFILE));
-        mbtnFacebookLogin.registerCallback(authCallBackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-
-            }
-        });
+//        mbtnFacebookLogin = findViewById(R.id.btnFacebookLogin);
+//        mbtnFacebookLogin.setReadPermissions(Arrays.asList(EMAIL, PUBLIC_PROFILE));
+//        mbtnFacebookLogin.registerCallback(authCallBackManager, new FacebookCallback<LoginResult>() {
+//            @Override
+//            public void onSuccess(LoginResult loginResult) {
+//
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//
+//            }
+//
+//            @Override
+//            public void onError(FacebookException error) {
+//
+//            }
+//        });
 //        binding.loginBtnAuthFacebook.setReadPermissions(Arrays.asList(EMAIL, PUBLIC_PROFILE));
 //
 //        binding.loginBtnAuthFacebook.registerCallback(authCallBackManager, new FacebookCallback<LoginResult>() {
